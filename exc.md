@@ -4,7 +4,7 @@
 - Fontos: első lépésként legyen egy venv-ed, ide kerüljenek a függőségek
 - A venv mappát tedd gitignoreba
 - Egy egyszerű CRUD alkamlazást kell készíteni
-- User-eket kell tudni menedzselni
+- User-eket kell tudni menedzselni (mockaroon le lehet generáltatni, elég 10 darab)
 - A usernek az alábbi attributumai vannak:
   - id
   - first_name
