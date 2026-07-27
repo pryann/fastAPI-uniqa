@@ -1,0 +1,21 @@
+# Feladat
+
+- Készítsd egy fastapi alkalmazást
+- Fontos: első lépésként legyen egy venv-ed, ide kerüljenek a függőségek
+- A venv mappát tedd gitignoreba
+- Egy egyszerű CRUD alkamlazást kell készíteni
+- User-eket kell tudni menedzselni
+- A usernek az alábbi attributumai vannak:
+  - id
+  - first_name
+  - last_name
+  - email_address
+  - job: opcionális
+- Az alkalmazásod tudja kezelni az alábbiakat:
+  - összes user visszaadása
+  - adott id-jú user visszaadása, ha nincs , akkor 404 exception
+  - adott id-jú user részleges frissítése, ha nincs , akkor 404 exception
+  - adott id-jú user törlése, ha nincs , akkor 404 exception
+- Legyenek meg a megfelelő Pydantic sémák
+- Ahol kell add meg a response modelt, és status_code-ot
+- Készítsd bruno-ba teszteket

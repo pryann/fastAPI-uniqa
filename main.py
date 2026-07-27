@@ -1,44 +1,16 @@
 import uvicorn
-from fastapi import FastAPI, HTTPException, status
-from pydantic import BaseModel
+from fastapi import FastAPI, status
+from schemas import BaseItem, Item, PartialItem
+from database import items
+from utils import find_item_or_raise, generate_new_id
+
 
 app = FastAPI()
-
-
-class BaseItem(BaseModel):
-    name: str
-    quantity: int
-
-
-class Item(BaseItem):
-    id: int
-
-
-class PartialItem(BaseModel):
-    name: str | None = None
-    quantity: int | None = None
-
-
-items = [
-    Item(id=1, name="Item 1", quantity=10),
-    Item(id=2, name="Item 2", quantity=20),
-    Item(id=3, name="Item 3", quantity=30),
-]
 
 
 @app.get("/")
 async def root():
     return {"message": "Hello fastAPI"}
-
-
-# CRUD operations: Create, Read, Update, Delete
-
-
-def find_item_or_raise(item_id: int) -> Item:
-    for item in items:
-        if item.id == item_id:
-            return item
-    raise HTTPException(status_code=404, detail="Item not found")
 
 
 # open("text.txt", "r", endcoding="utf-8")
@@ -51,14 +23,14 @@ async def get_items():
 # GET http://localhost:8000/items/1
 @app.get("/items/{item_id}", response_model=Item)
 async def find_item(item_id: int):
-    return find_item_or_raise(item_id)
+    return find_item_or_raise(item_id, items)
 
 
 # {"name": "item 4", "quantity": 40}
 # POST http://localhost:8000/items
 @app.post("/items", response_model=Item, status_code=status.HTTP_201_CREATED)
 async def create_item(create_item_payload: BaseItem):
-    new_id = max([item.id for item in items], default=0) + 1
+    new_id = generate_new_id(items)
     # items.append(Item(id=new_id, name=item.name, quantity=item.quantity))
     # A ** dict-en értelmezhető, kicsomagolja az objektumot
     # de mivel BaseItem tpusú adat van a model_dump() metódus visszaadja a dict-et, így a **-al kicsomagoljuk az adatokat
@@ -68,7 +40,7 @@ async def create_item(create_item_payload: BaseItem):
 
 @app.put("/items/{item_id}", response_model=Item)
 async def update_item(item_id: int, update_item_payload: BaseItem):
-    item = find_item_or_raise(item_id)
+    item = find_item_or_raise(item_id, items)
     for key, value in update_item_payload.model_dump().items():
         setattr(item, key, value)
     return item
@@ -82,23 +54,17 @@ async def update_item(item_id: int, update_item_payload: BaseItem):
 
 @app.patch("/items/{item_id}", response_model=Item)
 async def partial_update_item(item_id: int, update_item_payload: PartialItem):
-    for item in items:
-        if item.id == item_id:
-            for key, value in update_item_payload.model_dump(
-                exclude_unset=True
-            ).items():
-                setattr(item, key, value)
-            return item
-    raise HTTPException(status_code=404, detail="Item not found")
+    item = find_item_or_raise(item_id, items)
+    for key, value in update_item_payload.model_dump(exclude_unset=True).items():
+        setattr(item, key, value)
+    return item
 
 
 @app.delete("/items/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def remove_item(item_id: int):
-    for index, item in enumerate(items):
-        if item.id == item_id:
-            items.pop(index)
-            return
-    raise HTTPException(status_code=404, detail="Item not found")
+    item = find_item_or_raise(item_id, items)
+    items.remove(item)
+    # itemsből az itemet törljétek ki
 
 
 if __name__ == "__main__":
