@@ -52,5 +52,6 @@ def greetings(name: Annotated[str, "this is a metadata"]) -> str:
 ```
 
 ## Projekt
-- ellenőrizni kel laz útvonalakat mert src folder nincs itt
+- ellenőrizni kell az útvonalakat mert src folder nincs itt
 - az sqlalchemyt is telepíteni kell függőségként
+- - a script mappa csak a az alembic miatt kellene
