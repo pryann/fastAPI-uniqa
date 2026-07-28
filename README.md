@@ -51,4 +51,6 @@ def greetings(name: Annotated[str, "this is a metadata"]) -> str:
   return f"Hi {name}"
 ```
 
-## Pydantic
+## Projekt
+- ellenőrizni kel laz útvonalakat mert src folder nincs itt
+- az sqlalchemyt is telepíteni kell függőségként
