@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
 
 from typing import Literal
 
@@ -24,3 +24,9 @@ class FilterParams(BaseModel):
     limit: int = Field(10, ge=1, le=100)
     order_by: Literal["id", "quantity"] = "id"
     order_direction: Literal["asc", "desc"] = "asc"
+
+
+class Registration(BaseModel):
+    username: str
+    password: str
+    email: EmailStr

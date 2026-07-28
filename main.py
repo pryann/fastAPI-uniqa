@@ -6,6 +6,7 @@ import uvicorn
 from fastapi import (
     FastAPI,
     File,
+    Form,
     Query,
     status,
     Header,
@@ -14,13 +15,16 @@ from fastapi import (
     UploadFile,
     Cookie,
 )
+from fastapi.staticfiles import StaticFiles
 
 from database import items
-from schemas import BaseItem, FilterParams, Item, PartialItem
+from schemas import BaseItem, FilterParams, Item, PartialItem, Registration
 from utils import find_item_or_raise, generate_new_id
 
 
 app = FastAPI()
+
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 
 @app.get("/")
@@ -131,6 +135,14 @@ def upload_and_save(uploaded_file: UploadFile):
         content = uploaded_file.file.read()
         f.write(content)
     return {"filename": self_filename, "path": str(file_path)}
+
+
+@app.post("/registration")
+async def registration(form_data: Annotated[Registration, Form()]):
+    return {
+        "message": "Registration successful",
+        "data": form_data.model_dump(exclude={"password"}),
+    }
 
 
 if __name__ == "__main__":

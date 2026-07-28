@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <form action="http://localhost:8000/registration" method="POST">
+      <div>
+        <label for="username">Username</label>
+        <input type="text" name="username" id="username" placeholder="username" />
+      </div>
+      <div>
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email" placeholder="name@domain.xy" />
+      </div>
+      <div>
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" />
+      </div>
+      <div>
+        <input type="button" value="Submit" id="submit" />
+      </div>
+    </form>
+  </body>
+
+  <script>
+    const submitButton = document.querySelector('#submit')
+
+    submitButton.addEventListener('click', async () => {
+      const formData = new FormData(document.querySelector('form'))
+      const result = await fetch('http://localhost:8000/registration', {
+        method: 'POST',
+        body: formData,
+        // it is not formData, it is JSON now
+        // body: JSON.stringify(Object.fromEntries(formData)),
+        // headers: {
+        //   'Content-Type': 'application/json',
+        // },
+      })
+      console.log(result)
+    })
+  </script>
+</html>
