@@ -1,7 +1,22 @@
+from datetime import datetime, timezone
+from typing import Annotated
+from pathlib import Path
+
 import uvicorn
-from fastapi import FastAPI, status
-from schemas import BaseItem, Item, PartialItem
+from fastapi import (
+    FastAPI,
+    File,
+    Query,
+    status,
+    Header,
+    Response,
+    Body,
+    UploadFile,
+    Cookie,
+)
+
 from database import items
+from schemas import BaseItem, FilterParams, Item, PartialItem
 from utils import find_item_or_raise, generate_new_id
 
 
@@ -9,15 +24,43 @@ app = FastAPI()
 
 
 @app.get("/")
-async def root():
-    return {"message": "Hello fastAPI"}
+async def root(accept_language: Annotated[str | None, Header()] = None):
+    lang = accept_language.split(",")[0][:2] if accept_language else "en"
+    massage = {"en": "hi", "hu": "hello"}
+    return {"message": massage.get(lang, "hi")}
 
 
-# open("text.txt", "r", endcoding="utf-8")
-# GET http://localhost:8000/items
+# not a real login, no pass, no validation, just a simple example for creating a cookie
+@app.post("/login")
+async def login(response: Response, username: Annotated[str, Body(embed=True)]):
+    response.set_cookie(
+        key="session_id",
+        value=f"session_{username}_{datetime.now(tz=timezone.utc).timestamp()}",
+        max_age=3600,
+        httponly=True,
+    )
+    return {"message": "logged in successfully"}
+
+
+@app.get("/profile")
+async def profile(session_id: Annotated[str | None, Cookie()] = None):
+    if not session_id:
+        return {"message": "not logged in"}
+    return {"message": "user profile"}
+
+
+# open("text.txt", "r", encoding="utf-8")
+# GET http://localhost:8000/items?offset=0&limit=10&order_by=quantity&order_direction=asc
 @app.get("/items", response_model=list[Item])
-async def get_items():
-    return items
+async def get_items(query: Annotated[FilterParams, Query()]):
+    # def sort_by(item):
+    #     return getattr(item, query.order_by)
+    sorted_items = sorted(
+        items,
+        key=lambda item: getattr(item, query.order_by),
+        reverse=query.order_direction == "desc",
+    )
+    return sorted_items[query.offset : query.offset + query.limit]
 
 
 # GET http://localhost:8000/items/1
@@ -65,6 +108,29 @@ async def remove_item(item_id: int):
     item = find_item_or_raise(item_id, items)
     items.remove(item)
     # itemsből az itemet törljétek ki
+
+
+@app.get("/companies/{company_id}/items", response_model=list[Item])
+def get_items_by_company(company_id: int):
+    return [item for item in items if item.company_id == company_id]
+
+
+@app.get("/companies/{company_id}/items/{item_id}", response_model=Item)
+def get_item_by_company_and_id(company_id: int, item_id: int):
+    find_item_or_raise(item_id, items)
+    return [i for i in items if i.company_id == company_id and i.id == item_id]
+
+
+@app.post("/upload")
+def upload_and_save(uploaded_file: UploadFile):
+    self_filename = Path(uploaded_file.filename).name
+    upload_dir = Path("uploads")
+    upload_dir.mkdir(exist_ok=True)
+    file_path = upload_dir / self_filename
+    with open(file_path, "wb") as f:
+        content = uploaded_file.file.read()
+        f.write(content)
+    return {"filename": self_filename, "path": str(file_path)}
 
 
 if __name__ == "__main__":
