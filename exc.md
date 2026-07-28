@@ -1,4 +1,6 @@
-# Feladat
+# Feladatok
+
+## User CRUD
 
 - Készítsd egy fastapi alkalmazást
 - Fontos: első lépésként legyen egy venv-ed, ide kerüljenek a függőségek
@@ -16,6 +18,25 @@
   - adott id-jú user visszaadása, ha nincs , akkor 404 exception
   - adott id-jú user részleges frissítése, ha nincs , akkor 404 exception
   - adott id-jú user törlése, ha nincs , akkor 404 exception
+- Legyenek meg a megfelelő Pydantic sémák
+- Ahol kell add meg a response modelt, és status_code-ot
+- Készítsd bruno-ba teszteket
+
+# Products CRUD
+- Készítsd egy fastapi alkalmazást
+- Fontos: első lépésként legyen egy venv-ed, ide kerüljenek a függőségek
+- A venv mappát tedd gitignoreba
+- Egy egyszerű CRUD alkamlazást kell készíteni
+- Product-okat kell tudni menedzselni (mockaroon le lehet generáltatni, elég 10 darab)
+- A usernek az alábbi attributumai vannak:
+  - id
+  - name
+  - price
+- Az alkalmazásod tudja kezelni az alábbiakat:
+  - összes product visszaadása
+  - adott id-jú product visszaadása, ha nincs , akkor 404 exception
+  - adott id-jú product részleges frissítése, ha nincs , akkor 404 exception
+  - adott id-jú product törlése, ha nincs , akkor 404 exception
 - Legyenek meg a megfelelő Pydantic sémák
 - Ahol kell add meg a response modelt, és status_code-ot
 - Készítsd bruno-ba teszteket
